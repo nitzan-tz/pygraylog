@@ -2,7 +2,10 @@ import base64
 import requests
 from endpoints import endpoints
 from urlparse import urlparse
+import urllib
+
 class GraylogAPI(object):
+    urllib.quote_plus=urllib.quote # A fix for urlencoder to give %20 
     def __init__(self, url, username=None, password=None, api_key=None):
 
         # check if the username / password vs. api_key cannot be provided at same time
@@ -45,13 +48,15 @@ class GraylogAPI(object):
             
         header = {
             'Authorization' : 'Basic ' + base64.b64encode(payload),
-            'Accept' : 'application/json'
+#            'Accept' : 'application/json'
+             'Accept' : '*/*'
         }
         return header
 
     def _get(self, **kwargs):
         headers = self.build_auth_header()
-        r = requests.get(self.url, params=kwargs, headers=headers)
+        param = urllib.urlencode(kwargs) #encodes the data
+        r = requests.get(self.url, params=param, headers=headers)
 
         return r.text
 
